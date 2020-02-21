@@ -53,28 +53,11 @@ function displayResults(responseText) {
 
 		// Finally, append the <tr> tag to <tbody> to display the results on the browser
 		document.querySelector("tbody").appendChild(trTag);
-
-		
-
 	}
 }
 
-document.querySelector("#search-form").onsubmit = function(event) {
-
-	// Don't actually submit this form. We're creating a single page app!
-	event.preventDefault();
-
-	// Grab user input 
-	let searchInput = document.querySelector("#search-id").value.trim();
-	let limitInput = document.querySelector("#limit-id").value;
-
-	let url = "https://itunes.apple.com/search?term=" + searchInput + "&limit=" + limitInput;
-
-	console.log(searchInput);
-	console.log(limitInput);
-
+function ajax(url, returnFunction) {
 	// Make the http request to iTunes via AJAX using the vanillla JS way
-
 	let httpRequest = new XMLHttpRequest();
 
 	// Sent a request to iTunes
@@ -93,7 +76,7 @@ document.querySelector("#search-form").onsubmit = function(event) {
 				// 200 means we got a succesful response back!
 				// console.log(httpRequest.responseText);
 				// Pass the response to a function that will handle the display 
-				displayResults(httpRequest.responseText);
+				returnFunction(httpRequest.responseText);
 			}
 			else {
 				// There is some error
@@ -101,9 +84,28 @@ document.querySelector("#search-form").onsubmit = function(event) {
 				console.log(httpRequest.status)
 			}
 
-			
 		}
 	}
-	// Can't just wait here
+
+}
+
+document.querySelector("#search-form").onsubmit = function(event) {
+
+	// Don't actually submit this form. We're creating a single page app!
+	event.preventDefault();
+
+	// Grab user input 
+	let searchInput = document.querySelector("#search-id").value.trim();
+	let limitInput = document.querySelector("#limit-id").value;
+
+	let url = "https://itunes.apple.com/search?term=" + searchInput + "&limit=" + limitInput;
+
+	console.log(searchInput);
+	console.log(limitInput);
+
+	// Separate out the function that makes http requests via ajax
+	// Two params - the url and the name of function that gets called after a response is received 
+	ajax(url, displayResults);
+
 	console.log("hey");
 }
