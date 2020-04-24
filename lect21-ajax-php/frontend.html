@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>AJAX and PHP</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css">
+	<style>
+		li {
+			margin-top: 5px;
+		}
+	</style>
+</head>
+<body>
+
+	<div class="container">
+		<div class="row">
+			<div id="test-output"></div>
+			<h1 class="col-12 mt-3">Song DB Search</h1>
+		</div> <!-- .row -->
+
+		<div class="row">
+			<form action="" method="" class="form-inline col-12 mt-3">
+				<div class="form-group">
+					<label for="search-term-id" class="sr-only">Search:</label>
+					<input type="text" class="form-control" id="search-term-id" placeholder="Search..." name="search-term">
+				</div>
+				<button type="submit" class="btn btn-primary ml-3">Search</button>
+			</form>
+		</div> <!-- .row -->
+
+		<div class="row">
+
+			<h4 class="col-12 mt-4">Search Results:</h4>
+
+			<div class="col-12">
+				<ol id="search-results">
+					<li>Track Name 1</li>
+					<li>Track Name 2</li>
+				</ol>
+			</div>
+
+		</div> <!-- .row -->
+	</div> <!-- .container -->
+
+<script>
+
+	document.querySelector("form").onsubmit = function(event) {
+		// Prevent form from actually submitting (no page refresh)
+		event.preventDefault();
+
+		// Grab the user input
+		let searchTerm = document.querySelector("#search-term-id").value.trim();
+
+		// Make the AJAX request
+		ajaxGet("backend.php?term=" + searchTerm, function(results) {
+
+			console.log(results);
+			results = JSON.parse(results);
+			console.log(results);
+
+			// Display the results on the browser
+			let resultsList = document.querySelector("#search-results");
+
+			// Clear all the previous results upon every search.
+			while(resultsList.hasChildNodes()) {
+				resultsList.removeChild(resultsList.lastChild);
+			}
+
+			// Run through the results, create an <li> element for each result, then append each result to the resultsList
+			for(let i = 0; i <results.length; i++) {
+				let li = document.createElement("li");
+				li.innerHTML = results[i].name;
+				resultsList.appendChild(li);
+			}
+
+		});
+	}
+
+	// ajaxGet("backend.php?firstName=Tommy&lastName=Trojan", function(results) {
+	// 	// This code runs when a successful response is received from the server
+	// 	console.log(results);
+	// 	// Convert JSON string into JS objects
+	// 	results = JSON.parse(results);
+	// 	console.log(results);
+	// 	console.log(results.first_name);
+
+	// 	// Display this info in the browser
+	// 	document.querySelector("#test-output").innerHTML = results.first_name;
+	// });
+
+	function ajaxGet(endpointUrl, returnFunction){
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', endpointUrl, true);
+		xhr.onreadystatechange = function(){
+			if (xhr.readyState == XMLHttpRequest.DONE) {
+				if (xhr.status == 200) {
+					// When a success response is returned from the server
+					returnFunction( xhr.responseText );
+				} else {
+					alert('AJAX Error.');
+					console.log(xhr.status);
+				}
+			}
+		}
+		xhr.send();
+	};
+
+	// Make a post request
+	// ajaxPost("backend.php", "firstName=Tommy&lastName=Trojan", function(results) {
+	// 	console.log(results);
+	// });
+
+	function ajaxPost(endpointUrl, postData, returnFunction){
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', endpointUrl, true);
+		// POST requests usually need some extra information in the header. content-type dictates what kind of format the parameters are.
+		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xhr.onreadystatechange = function(){
+			if (xhr.readyState == XMLHttpRequest.DONE) {
+				if (xhr.status == 200) {
+					returnFunction( xhr.responseText );
+				} else {
+					alert('AJAX Error.');
+					console.log(xhr.status);
+				}
+			}
+		}
+		xhr.send(postData);
+	};
+	
+</script>
+
+</body>
+</html>
